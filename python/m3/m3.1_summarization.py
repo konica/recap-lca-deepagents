@@ -14,6 +14,7 @@ Run:
 """
 
 import asyncio
+import uuid
 
 from deepagents import create_deep_agent
 from langchain_core.messages import HumanMessage
@@ -31,7 +32,7 @@ agent = create_deep_agent(
     system_prompt="You are a helpful assistant. Keep every response to one sentence.",
 )
 
-THREAD = {"configurable": {"thread_id": "demo"}}
+THREAD = {"configurable": {"thread_id": "demo-" + str(uuid.uuid4())[:8] }}
 
 
 async def turn(message: str) -> str:

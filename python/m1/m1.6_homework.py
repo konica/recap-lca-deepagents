@@ -61,15 +61,40 @@ from models import model
 async def build_tools():
     """TODO 1: build a MultiServerMCPClient, fetch its tools, filter them,
     and return the filtered list."""
-    raise NotImplementedError("TODO 1: see the comment block above")
+    # raise NotImplementedError("TODO 1: see the comment block above")
+    client = MultiServerMCPClient({
+            "sequence-thinking": {
+                "transport": "stdio",
+                "command": "npx",
+                "args": [
+                    "-y",
+                    "@modelcontextprotocol/server-sequential-thinking"
+                ]
+            }
+        })
+    tools = await client.get_tools()
 
+    print(f"\nsequence-thinking: {len(tools)} tool(s)")
+    for t in tools:
+        print(f"  {t.name}")
+        print(f"  {t.description[:90]}")
+
+    # filter to allowed tools only
+    ALLOWED = {"sequentialthinking"}
+    tools = [t for t in tools if t.name in ALLOWED]
+
+    print(f"\nfiltered to: {len(tools)} tool(s)")
+    for t in tools:
+        print(f"  {t.name}")
+
+    return tools
 
 # ════════════════════════════════════════════════════════════════════════
 # TODO 2: Write a question suited to your chosen server's own domain,
 # not Lab 1's "what is MCP..." question.
 # ════════════════════════════════════════════════════════════════════════
 
-QUESTION = "TODO 2: replace with a question that puts your chosen tool(s) to work."
+QUESTION = "Make a plan step-by-step to prepare for the technical interview."
 
 
 async def main():

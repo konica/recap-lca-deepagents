@@ -52,7 +52,7 @@ from models import model
 #   )
 # ════════════════════════════════════════════════════════════════════════
 
-SYSTEM_PROMPT = "TODO 1: replace this with your own domain-scoping system prompt."
+SYSTEM_PROMPT = "You are a tutor for the grade 2 student. When you aren't asked for the questions not related to the knowledge of grade 2 in Vietnamse, you politely to reject and tell me ask in your scope"
 
 
 agent = create_deep_agent(

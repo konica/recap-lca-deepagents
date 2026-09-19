@@ -77,7 +77,15 @@ def query_chinook(sql: str) -> str:
 # single-query question is a perfectly fine answer too.
 # ════════════════════════════════════════════════════════════════════════
 
-TASK = None  # TODO 1: replace with your own question
+TASK = """
+You need to do the following sub tasks.
+1. Retrieve the top 5 customers who have the largest total sum of all their invoices. 
+The result should include the customer's ID, first name, last name, and the total amount of their invoices.
+2. Retrieve the top 5 customers based on the total amount of their invoices. 
+The result should include the customer's ID, first name, last name, and the total amount of each invoice. 
+Note that this query will return one invoice amount per customer, and the results will be ordered by the invoice total in descending order.
+3. Determine which customers satisify both sub tasks above.
+"""  # TODO 1: replace with your own question
 
 
 # ════════════════════════════════════════════════════════════════════════
@@ -91,7 +99,21 @@ TASK = None  # TODO 1: replace with your own question
 # ════════════════════════════════════════════════════════════════════════
 
 def eval_answer(answer_text: str) -> None:
-    raise NotImplementedError("TODO 2: see the comment block above")
+    return {
+        "sub-task-1": """6	Helena	Holý	49.62
+26	Richard	Cunningham	47.62
+57	Luis	Rojas	46.62
+45	Ladislav	Kovács	45.62
+46	Hugh	O'Reilly	45.62""",
+        "sub-task-2": """
+23	John	Gordon	13.86
+6	Helena	Holý	8.91
+10	Eduardo	Martins	8.91
+14	Mark	Philips	8.91
+27	Patrick	Gray	8.91
+"""
+
+    }
 
 
 if TASK is None:

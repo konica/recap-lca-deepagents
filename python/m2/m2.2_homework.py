@@ -52,7 +52,51 @@ from models import model
 #   backend = FilesystemBackend(root_dir=str(my_dir), virtual_mode=True)
 # ════════════════════════════════════════════════════════════════════════
 
-backend = None  # TODO 1: replace with a StateBackend, FilesystemBackend, or CompositeBackend
+skill_dir = Path(__file__).parent / "skills"
+skill_dir.mkdir(exist_ok=True)
+(skill_dir / "setup-python-venv").mkdir(exist_ok=True)
+(skill_dir / "setup-python-venv" / "SKILL.md").write_text("""
+---
+name: setup-python-venv
+description: Use when running, installing, or adding Python packages for any project in this sandbox, when creating a virtual environment, or when a venv fails with "failed to symlink ... Operation not permitted (os error 1)" on a /c/... mounted path.
+---
+
+# Python venvs in this sandbox
+
+Project directories live on a mounted drive (`/c/...`) that refuses symlink
+creation. Any venv created inside the project fails:
+
+```
+error: failed to symlink file from /usr/bin/python3.14 to
+/c/.../project/.venv/bin/python: Operation not permitted (os error 1)
+```
+
+Home (`/home/agent`) allows symlinks. So: **the venv always lives at
+`~/.venvs/<project-name>`, never in the project.**
+
+## Rules
+
+1. **`uv` is the only Python package manager.** `uv add`, `uv sync`,
+   `uv run`, `uv lock`. Never `pip install`, `python -m venv`, `poetry`,
+   `conda`, or `virtualenv` for a project's dependencies.
+2. **Never create `.venv` in the project.** It fails, and a half-created
+   `.venv/` left behind confuses later runs — delete it if you find one.
+3. **Prefix `UV_PROJECT_ENVIRONMENT` on every uv command.** Each Bash call
+   is a fresh shell, so `export` does not survive to the next command.
+4. **Never set `UV_PROJECT_ENVIRONMENT` globally** (shell profile,
+   `/etc/sandbox-persistent.sh`). It holds one value and would silently
+   point every other project at the wrong venv.
+""")
+backend = CompositeBackend(
+        default=StateBackend(),
+        routes={
+            "/skills/": FilesystemBackend(
+                root_dir=str(skill_dir),
+                virtual_mode=True,
+            ),
+        },
+    ) 
+  # TODO 1: replace with a StateBackend, FilesystemBackend, or CompositeBackend
 
 
 # ════════════════════════════════════════════════════════════════════════
@@ -64,8 +108,14 @@ backend = None  # TODO 1: replace with a StateBackend, FilesystemBackend, or Com
 # empty and skipping permissions entirely is also a valid choice.
 # ════════════════════════════════════════════════════════════════════════
 
-TASK = None  # TODO 2: replace with your own task message
-permissions: list[FilesystemPermission] = []  # TODO 2 (optional): add rules here
+TASK = "Tell me the purpose of the skill `setup-python-venv` in the `skills` folder. Then create a new file to summarize that purpose"  # TODO 2: replace with your own task message
+permissions: list[FilesystemPermission] = [
+    FilesystemPermission(
+      operations=["write"],
+      paths=["/skills/setup-python-venv/SKILL.md"],
+      mode="deny",
+    ),
+]  # TODO 2 (optional): add rules here
 
 if backend is None:
     raise NotImplementedError("TODO 1: see the comment block above")
@@ -80,7 +130,7 @@ agent = create_deep_agent(
 
 result = agent.invoke(
     {"messages": [{"role": "user", "content": TASK}]},
-    config={"configurable": {"thread_id": "homework-m2.2"}},
+    config={"configurable": {"thread_id": "homework-m2.2_homework"}},
 )
 
 print(result["messages"][-1].content)

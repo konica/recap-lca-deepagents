@@ -26,11 +26,15 @@ import warnings
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
+from pathlib import Path
 from langchain_core.tools import tool
+from langchain_community.utilities import SQLDatabase
 
 from deepagents import create_deep_agent
 from models import model
 
+DB_PATH = Path(__file__).parent / "chinook.db"
+db = SQLDatabase.from_uri(f"sqlite:///{DB_PATH}")
 
 # ════════════════════════════════════════════════════════════════════════
 # TODO 1: Define your own custom tool.
@@ -51,9 +55,21 @@ from models import model
 # ════════════════════════════════════════════════════════════════════════
 
 @tool
-def your_custom_tool(query: str) -> str:
-    """TODO 1: replace this docstring and body with your own tool."""
-    raise NotImplementedError("TODO 1: see the comment block above")
+def find_customer(firstName: str, lastName: str) -> str:
+    """Run a search query and return the customer info against against the Chinook music store database."""
+    try:
+        result = db.run(f"""
+        SELECT CustomerId, FirstName, LastName, Company, Address, City, State, Country, PostalCode, Phone, Fax, Email, SupportRepId
+        FROM Customer
+        WHERE FirstName = '{firstName}' AND lastName = '{lastName}'
+        LIMIT 1
+        """)
+        if len(result):
+            return str(result)
+        else: 
+            raise Exception(f"Not found the customer {firstName} {lastName}")
+    except Exception as e:
+        return f"Error: {e}"
 
 
 # ════════════════════════════════════════════════════════════════════════
@@ -65,11 +81,14 @@ def your_custom_tool(query: str) -> str:
 # read_sql.
 # ════════════════════════════════════════════════════════════════════════
 
-SYSTEM_PROMPT = """TODO 2: replace this with your own system prompt."""
+SYSTEM_PROMPT = """You are the Helpdesk in the music company. 
+    Use the find_customer to find the customer info before asking their question.
+    If don't find any customer, say sorry politely.
+"""
 
 # Guards against running with an unfilled placeholder; the filled
 # reference doesn't need this since there's no placeholder text left.
-if "TODO 1" in your_custom_tool.description:
+if "TODO 1" in find_customer.description:
     raise NotImplementedError("TODO 1: see the comment block above")
 if "TODO 2" in SYSTEM_PROMPT:
     raise NotImplementedError("TODO 2: see the comment block above")
@@ -77,12 +96,12 @@ if "TODO 2" in SYSTEM_PROMPT:
 agent = create_deep_agent(
     model=model,
     name="Homework_Agent",
-    tools=[your_custom_tool],
+    tools=[find_customer],
     system_prompt=SYSTEM_PROMPT,
 )
 
 result = agent.invoke(
-    {"messages": [{"role": "user", "content": "Ask your agent a question that needs your tool."}]}
+    {"messages": [{"role": "user", "content": "My name is Kara	Nielsen. I have a problem with my new iPod. It doesn't work now. What can I do?"}]}
 )
 
 print(result["messages"][-1].content)

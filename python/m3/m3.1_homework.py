@@ -62,7 +62,17 @@ from models import model
 
 def build_turns() -> list[str]:
     """TODO 1: return your own list of user turns (at least 8)."""
-    raise NotImplementedError("TODO 1: see the comment block above")
+    return [
+        "My name is Trung Thao. I'm a AI/ML passinatist. Tell me about LLM",
+        "What is the main architecture?",
+        "Why is the attention important?",
+        "What is the relationship between LLM and agent?",
+        "Can you build the autonomous agent without LLM?",
+        "What is the agent harness and why do we need it?",
+        "What is the primary component in the agent harness? Explain it",
+        "How to build a reliable agent with harness?",
+        "Summarize all things I ask in three bullet point like takeaway."
+    ]
 
 
 # ════════════════════════════════════════════════════════════════════════
@@ -75,7 +85,7 @@ def build_turns() -> list[str]:
 # you wrote and how long they are.
 # ════════════════════════════════════════════════════════════════════════
 
-MAX_INPUT_TOKENS = None  # TODO 2: replace None with your chosen integer threshold
+MAX_INPUT_TOKENS = 2_000  # TODO 2: replace None with your chosen integer threshold
 
 model.profile = {**model.profile, "max_input_tokens": MAX_INPUT_TOKENS}
 
@@ -85,7 +95,7 @@ agent = create_deep_agent(
     system_prompt="You are a helpful assistant. Keep every response to one sentence.",
 )
 
-THREAD = {"configurable": {"thread_id": "homework"}}
+THREAD = {"configurable": {"thread_id": "homework-102"}}
 HISTORY_PATH = f"/conversation_history/{THREAD['configurable']['thread_id']}.md"
 
 

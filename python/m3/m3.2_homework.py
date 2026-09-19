@@ -38,7 +38,7 @@ from models import model
 
 # This name becomes the skill's directory name. It must exactly match the
 # `name:` field you write in the frontmatter inside build_skill_md() below.
-SKILL_NAME = "your-skill-name"
+SKILL_NAME = "master-agent-engineer"
 REFERENCE_PATH = f"/skills/{SKILL_NAME}/reference.md"
 
 
@@ -70,7 +70,26 @@ REFERENCE_PATH = f"/skills/{SKILL_NAME}/reference.md"
 
 def build_skill_md() -> str:
     """TODO 1: return your own SKILL.md content as a string."""
-    raise NotImplementedError("TODO 1: see the comment block above")
+    return """---
+name: master-agent-engineer
+description: Use when the user wants to how to build and master the agent engineer
+---
+
+# Master Agent Engineer
+
+## What is the agent engineer?
+It's a job that the engineer apply the LLM capabilities into building the autonomous agent. 
+
+## How to build agent engineer
+1. Get familiar with the SDLC
+2. Learn knowledge about AI/ML, especially LLM
+3. Build RAG system to understand the semantic search and evalate that system
+4. Build the chatbot to know the reasoning ability of the model, how model guide to call tool, how to interact with the world via the action execution and ...
+5. How to build a reliable agent with LangChain and get LangChain Agent Engineer certificate.
+
+### Get more details
+Read ./reference.md
+"""
 
 
 # ════════════════════════════════════════════════════════════════════════
@@ -84,7 +103,27 @@ def build_skill_md() -> str:
 
 def build_reference_md() -> str:
     """TODO 2: return the content of your skill's reference.md."""
-    raise NotImplementedError("TODO 2: see the comment block above")
+    return """
+LangChain Certified Agent Engineer
+Exam guide: format, rules, and what each section covers.
+ARRIVE EARLY
+Please join your exam session at least 15 minutes before your scheduled start time. This window is used for ID check, room scan, and
+system verification with your proctor.
+If you join more than 10 minutes after your scheduled start time you will be marked as a no-show and will need to reschedule the
+exam at full cost.
+This is a 2-hour exam taken solo and proctored, with a dedicated LangSmith organization provisioned for you. It is structured around the
+Agent Development Lifecycle (ADLC). The exam is semi-open-book: you may consult a small set of LangChain-owned resources, but
+no general search, AI assistants, or second screens.
+Exam-day logistics
+You will receive two invites in relation to this exam. The first will be an invite to take the test itself in a proctored environment,
+accompanied by a calendar invite for your scheduled slot.
+The second will be an email invite to a dedicated LangSmith organization, sent roughly two hours before your scheduled start time.
+This org is used to answer several of the questions on the exam.
+If you have not received either invite by two hours before your start time, contact certification-support@langchain.dev for
+assistance.
+If, when you accept the LangSmith invite, you see an error such as "the invite is no longer available", you are likely still logged into a
+LangSmith org that uses SSO. Log out of that org first, then accept the invite by signing in with email or Google rather than SSO.
+"""
 
 
 # Write the skill to a scratch directory so it's discoverable through a
@@ -108,8 +147,8 @@ print(f"Skill files written to: {_skill_dir}")
 # closely enough that the agent activates it.
 # ════════════════════════════════════════════════════════════════════════
 
-SYSTEM_PROMPT = """TODO 3: replace this with your own system prompt."""
-USER_QUESTION = "TODO 3: replace this with a question that should trigger your skill."
+SYSTEM_PROMPT = """You are a helpful expert with the lot of experience about build reliable agentic system."""
+USER_QUESTION = "I'm a layman. I know what is the agent engineer? Which skill do I need to build? Which certificate should I get?"
 
 agent = create_deep_agent(
     model=model,
@@ -119,7 +158,9 @@ agent = create_deep_agent(
     system_prompt=SYSTEM_PROMPT,
 )
 
-result = agent.invoke({"messages": [{"role": "user", "content": USER_QUESTION}]})
+THREAD = {"configurable": {"thread_id": "homework-102"}}
+
+result = agent.invoke({"messages": [{"role": "user", "content": USER_QUESTION}]}, config=THREAD)
 print(result["messages"][-1].content)
 
 read_calls = [
